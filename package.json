@@ -1,0 +1,11 @@
+{
+  "name": "melodIo",
+  "version": "1.0.0",
+  "description": "Get your Music right man!",
+  "main": "index.js",
+  "author": "Thomas Cottiaux ",
+  "license": "MIT",
+  "dependencies": {
+    "vite": "^6.3.3"
+  }
+}
