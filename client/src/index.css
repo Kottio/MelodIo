@@ -3,7 +3,8 @@
 
 @custom-variant dark (&:is(.dark *));
 :root {
-  font-family: "Josefin Sans", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Jura", "Josefin Sans", system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
