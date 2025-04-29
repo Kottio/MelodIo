@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Compositions {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  name        String   @db.VarChar(255)
+  description String
+  starred     Boolean  @default(false)
+  styles      String[]
+  parts       Parts[]  @relation("CompositionParts")
+}
+
+model Parts {
+  id             Int              @id @default(autoincrement())
+  composition_id Int
+  createdAt      DateTime         @default(now())
+  name           String           @db.VarChar(255)
+  type           String
+  styles         String[]
+  melody         String[]
+  composition    Compositions     @relation("CompositionParts", fields: [composition_id], references: [id])
+  session        SessionsHarmony?
+}
+
+model SessionsHarmony {
+  id               Int      @id @default(autoincrement())
+  partId           Int      @unique
+  createdAt        DateTime @default(now())
+  name             String   @db.VarChar(255)
+  melody           String[]
+  harmonizedChords String[]
+  style            String   @default("Neo-Classical")
+  harmonization    Json
+  part             Parts    @relation(fields: [partId], references: [id])
+}

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMeyda } from "@/hooks/useMeyda";
 import { Button } from "../ui/button";
@@ -14,10 +14,30 @@ import {
 
 const strRecording = "onClick({...})";
 
+
+const session = {
+
+  sessionid: 1,
+  partId: 1,
+  // compId
+  melodySaved: false,
+  melody: [],
+  harmonizedChords: [],
+  harmonization: [],
+}
+
+// Check if melody Saved and render accordingly 
+// On melodyu save, post the session with the melody a the right partid. returun the session. 
+// Check if harmonized already or add it to the back and render accordingly
+//Save harmonization.harmony in harmonization
+//Easier to add other analyzi later on 
+
+//Then llm Check cleaning and adding analysis? 
+//Then loading. 
+//Then prisma. 
+//Then Styling 
+
 function Part() {
-
-
-
   const { partId, compositionId } = useParams<{
     partId: string;
     compositionId: string;
@@ -33,82 +53,8 @@ function Part() {
     harmony: [],
     advices: [],
   });
+
   const [isHarmonized, setIsHarmonized] = useState(false);
-  const [session, setSession] = useState({})
-  const [showAdvices, setShowAdvices] = useState(true)
-
-  useEffect(() => {
-    getSession(partId)
-  }, [])
-
-  const [loading, setLoading] = useState(false)
-  const [secondsElapsed, setSecondsElapsed] = useState(0);
-  // For Loading time 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (loading) {
-      setSecondsElapsed(0)
-      timer = setInterval(() => {
-        setSecondsElapsed((prev) => prev + 1);
-      }, [100])
-    }
-  }, [loading])
-
-  async function getSession(partId) {
-    try {
-      const response = await fetch(`http://localhost:8080/${partId}/session`)
-      if (!response.ok) {
-        console.log("No session saved yet")
-        return
-      } else {
-        const data = await response.json()
-        const session = data.sessions[0]
-        console.log(data.sessions[0])
-
-        if (session.melody?.length) {
-          setMelody(session.melody);
-          setMelodySaved(true)
-        }
-
-        if (session.harmonization && Object.keys(session.harmonization).length > 0) {
-          //When printing harmony add a map to goe over all the harmony already made
-          setHarmonization(session.harmonization);
-          setIsHarmonized(true)
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching session:", error);
-    }
-  }
-  async function saveMelody(partId: string, melody: string[]) {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify({
-        partId: +partId, melody
-      }),
-    };
-    console.log(partId, melody)
-
-    const response = await fetch(`http://localhost:8080/${partId}/melody`, options)
-    if (response.ok) {
-      console.log('Session Created and Melody Saved')
-    }
-  }
-  async function saveHarmonization(harmonization: {}) {
-    const options = {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify({ harmonization, style })
-    }
-    const response = await fetch(`http://localhost:8080/${partId}/harmonization`, options)
-    if (!response.ok) { console.log('Could not save the harmonization') }
-    else { console.log("harmonization Saved") }
-  }
 
   const harmonize = async function (
     melody: string[],
@@ -129,9 +75,9 @@ function Part() {
     const response = await fetch("http://localhost:8080/harmonize", options);
     if (response.ok) {
       const data = await response.json();
+      console.log(data.JsonHarmonized);
       setHarmonization(JSON.parse(data.JsonHarmonized));
-      saveHarmonization(JSON.parse(data.JsonHarmonized))
-      setLoading(false)
+      console.log(data.JsonHarmonized);
       setIsHarmonized(true);
     }
   };
@@ -195,7 +141,6 @@ function Part() {
           onClick={() => {
             setChord(harmony);
             setChordDedtail(true);
-            setShowAdvices(false)
           }}
         >
           <div className="border-1 border-white bg-cyan-500 flex justify-start items-end w-30 h-18 ">
@@ -226,34 +171,11 @@ function Part() {
   function printChordDetail(harmony) {
     return (
       <div className="text-white flex flex-col border-1 p-5 border-cyan-300 gap-1 ">
-        <div className="flex items-end justify-between">
-          <div className="flex gap-3 items-end ">
-            <span className="text-2xl text-cyan-300 font-extrabold">
-              {harmony.chord}
-            </span>
-            <span className="text-xl font-bold"> {harmony.romanNumeral}</span>
-          </div>
-          <div>
-
-            <button onClick={() => { setChordDedtail(false) }}         >
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 29 29"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M21.75 7.25L7.25 21.75M7.25 7.25L21.75 21.75"
-                  stroke="white"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-
+        <div>
+          <span className="text-2xl text-cyan-300 font-bold">
+            {harmony.chord}
+          </span>
+          <span className="text-xl font-bold"> {harmony.romanNumeral}</span>
         </div>
         <div className="flex text gap-3">
           <span>Scales: </span>
@@ -301,7 +223,6 @@ function Part() {
               </svg>
             </div>
           </div>
-
 
           {/* Begining of Section */}
           <div className=" w-8/9 border-l-1  flex  mt-3 px-5 justify-between items-start">
@@ -375,46 +296,12 @@ function Part() {
                     <button
                       className="text-white w-[180px] disabled:border-neutral-600 disabled:text-neutral-600  text-xl font-bold border-1 px-3 py-2 hover:bg-white hover:text-black transition-all disabled:hover:bg-black "
                       onClick={() => {
-                        harmonize(melody, style, level)
-                        setLoading(true);
+                        harmonize(melody, style, level);
                       }}
-                    // disabled={isHarmonized}
+                      disabled={isHarmonized}
                     >
                       :HARMONIZE{" "}
                     </button>
-
-
-
-                    {/* See the Advices */}
-                    {isHarmonized && <div className="text-white text-xl flex gap-5 w-full">
-                      <button
-                        onClick={() => {
-                          setShowAdvices((prev) => !prev)
-                          setChordDedtail(false)
-                        }}
-                        className="group flex items-center gap-5 p-2 w-full justify-center hover:border-1 border-neutral-600 transition-all duration-100"
-                        aria-label="Toggle advices list"
-                      >Advices
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 48 48"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M24 16V32M16 24H32M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z"
-                            stroke="white"
-                            strokeWidth="1"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="group-hover:stroke-[3] transition-all duration-300"
-                          />
-                        </svg>
-                      </button>
-                    </div>}
-
-
                   </div>
                 )}
                 {/* <Button className="p-7" > Harmonize </Button> */}
@@ -460,20 +347,9 @@ function Part() {
                 </div>
               )}
 
-
               <ul className="flex gap-6">
                 {melody.map((note, index) => printMelody(note, index))}
               </ul>
-
-
-
-              {/* Loading Div */}
-              {loading && <div className="text-white w-50 flex justify-between items-center gap-2">
-                <span className="text-xl font-bold" >Breeeewing.. </span>
-                <span className="text-3xl font-bold text-green-300"> {secondsElapsed} </span>
-              </div>}
-
-
 
               {!melodySaved && (
                 <div>
@@ -482,7 +358,6 @@ function Part() {
                     disabled={isRecording || melody.length == 0}
                     onClick={() => {
                       setMelodySaved(true);
-                      saveMelody(partId, melody)
                     }}
                   >
                     {" "}
@@ -498,7 +373,7 @@ function Part() {
                   )}
                 </ul>
               )}
-              <div className="flex flex-col items-center overflow-y-auto max-h-[400px] w-full">
+              <div className="flex flex-col items-center overflow-y-auto max-h-[400px]">
                 {isHarmonized && (
                   <div className="w-8/9 flex flex-col gap-3 ">
                     {chordDetail && <div>{printChordDetail(chord)}</div>}
@@ -506,31 +381,12 @@ function Part() {
 
                   </div>
                 )}
-                {isHarmonized && <div className="text-white flex flex-col  w-full items-start pt-5 ">
-
-
-                  {showAdvices && <div><span className="text-xl font-bold">Advices for {style} </span>
-                    <ul className="flex justify-center align-baseline p-2 gap-5">{harmonization.advices.map((advice, index) => {
-                      return <li key={index} className=" border-l-1 p-2">
-                        <div className="text-white flex flex-col gap-1">
-                          <span className="text-sm">{advice.advice}</span>
-                          <span className="text font-bold text-orange-300">{advice.example}</span>
-                        </div>
-                      </li>
-                    }
-                    )}</ul></div >
-
-                  }
-
-
-
-                </div>}
               </div>
 
             </section>
           </div>
-        </section >
-      </div >
+        </section>
+      </div>
     </>
   );
 }

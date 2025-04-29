@@ -1,69 +1,154 @@
 import { Link, useParams } from "react-router-dom"
 import { use, useEffect, useState } from "react"
 import { Button } from "./ui/button"
-import doodad from "./Part/asset/doodad.png"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 
 
 
 function Composition() {
   const [parts, setParts] = useState([])
   const { compositionId } = useParams<{ compositionId: string }>()
+  const [creating, setCreating] = useState(false)
+  const [name, setName] = useState('')
+  const [type, setType] = useState('Melody')
 
   async function getParts() {
     const response = await fetch(`http://localhost:8080/${compositionId}/Parts`)
     if (response.ok) {
       const result = await response.json()
       console.log(result)
-      setParts(result.part)
+      setParts(result.parts)
     }
   }
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault(); // prevent page refresh
+    postPart(name, type, compositionId)
+    setCreating(false)
+    setName('')
+  }
+
+
+  async function postPart(name: string, type: string, compositionId: string) {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify({
+        name, type, compositionId
+      })
+    }
+    const response = await fetch(`http://localhost:8080/${compositionId}/Parts`, options)
+    if (response.ok) {
+      console.log('Part posted')
+      getParts()
+    }
+  }
+
+
+
 
   useEffect(() => { getParts() }, [])
 
   function printPart(parts: {}) {
     return <li key={parts?.id} className="flex items-center justify-center">
-      <div className="text-white">🎹</div>
-      <div className="p-4 relative border-b-1 border-b-zinc-400 flex justify-between items-center  w-full" >
-        <div >
-          <div >
-            <span className="text-xl font-medium text-zinc-200 pr-3">{parts.name} </span>
-            <span className="text font-medium text-zinc-400" >{parts.created_at}</span>
+      <Link to={`/composition/${compositionId}/part/${parts.id}`} className="group w-full flex items-center"  >
+        <div className="text-white">🎹</div>
+        <div className="p-4 relative border-b-1 border-b-zinc-400 flex justify-between items-center  w-full" >
+          <div className="w-full">
+            <div >
+              <span className="text-xl font-medium text-zinc-200 pr-3 group-hover:text-blue-300">{parts.name} </span>
+              <span className="text-sm font-medium text-zinc-400" >{parts.createdAt.split('T')[0]}</span>
+            </div>
+            <div className="flex gap-5 items-end mt-1  ">
+              <span className="text-sm text-zinc-400" >{parts.type}</span>
+              <div className="flex gap-5 items-end   w-full ">
+                {parts.session?.melody.length > 0 && <span className="text text-red-300 font-bold" >{parts.session.melody.join(' - ')}</span>}
+                {parts.session?.harmonizedChords.length > 0 && <span className="text text-green-300 font-bold" >{parts.session.harmonizedChords.join(' - ')}</span>
+                }</div>
+
+            </div>
           </div>
-          <span className="text-sm text-zinc-400" >{parts.type}</span>
-        </div>
 
-        <div className="flex items-center">
+          <div className="flex  items-center">
+            {/* {parts.session?.style.length > 0 && < div className="text-sm text-zinc-200 pr-5 flex flex-col items-center "  >
+              <span >{parts.session?.style}</span>
+              <svg width="2" height="22" viewBox="0 0 2 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 41V0.5" stroke="url(#paint0_linear_12_210)" strokeLinecap="round" />
+                <defs>
+                  <linearGradient id="paint0_linear_12_210" x1="1.5" y1="31" x2="1.5" y2="2" gradientUnits="userSpaceOnUse">
+                    <stop offset="0.361538" stopColor="#D9D9D9" />
+                    <stop offset="0.793269" stopColor="#D9D9D9" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+              </svg>
 
-          <span className="text-sm text-zinc-200 pr-5 flex flex-col items-center "  >
-            {parts.styles}
-            <svg width="2" height="22" viewBox="0 0 2 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 41V0.5" stroke="url(#paint0_linear_12_210)" strokeLinecap="round" />
-              <defs>
-                <linearGradient id="paint0_linear_12_210" x1="1.5" y1="31" x2="1.5" y2="2" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.361538" stopColor="#D9D9D9" />
-                  <stop offset="0.793269" stopColor="#D9D9D9" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
+            </div>} */}
 
-          </span>
+            {/* <span className="text-sm text-zinc-400" >{composition.stared}</span> */}
 
-          {/* <span className="text-sm text-zinc-400" >{composition.stared}</span> */}
-          <Link to={`/composition/${compositionId}/part/${parts.id}`} className="group" >
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-all duration-300" >
-              <path d="M8.33334 19.9999H31.6667M31.6667 19.9999L20 8.33325M31.6667 19.9999L20 31.6666" stroke="#E5E5EA" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300 group-hover:stroke-[3]" />
+              <path d="M8.33334 19.9999H31.6667M31.6667 19.9999L20 8.33325M31.6667 19.9999L20 31.6666" stroke="#E5E5EA" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300 group-hover:stroke-[3] group-hover:stroke-blue-300" />
             </svg>
 
-          </Link>
 
-        </div>
-      </div>
-    </li>
+          </div>
+        </div >
+      </Link >
+    </li >
   }
 
   return <>
     <div className='w-screen h-screen flex justify-center items-center'  >
       {/* style={{ backgroundImage: `url(${doodad})` }} */}
+      {creating && <Card className="absolute z-10 w-100">
+        <CardHeader>
+          <CardTitle>Create a new Part</CardTitle>
+          <CardDescription>Set up yopur new creative workspace</CardDescription>
+        </CardHeader>
+        <CardContent >
+          <form onSubmit={(e) => { handleSubmit(e) }} className="flex flex-col gap-1">
+            <p >Enter a name for your Part</p>
+            <Input value={name} onChange={(e) => setName(e.target.value)}></Input>
+
+            <p className="pt-2">Type</p>
+            <Select onValueChange={(value) => setType(value)}>
+              <SelectTrigger className="w-full text-black " >
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Melody">Melody</SelectItem>
+                <SelectItem value="Study">Study</SelectItem>
+                <SelectItem value="Recording">Recording</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex justify-around items-center mt-7">
+              <Button variant="ghost" onClick={() => { setCreating(false) }}>Cancel</Button>
+              <Button type="submit" className="bg-black text-white border-black hover:bg-white hover:text-black">Submit</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card >
+      }
+
 
       <section className="bg-[#101010] w-13/14 h-13/14 rounded flex flex-col  items-center">        {/* <div className=" w-full flex flex-col items-center"> */}
 
@@ -98,18 +183,27 @@ function Composition() {
                 <span className="text-3xl text-neutral-200">
                   PARTS </span>
               </div>
-              <span className="text-xl  text-neutral-200">
-                Composition {compositionId} </span>
+              <button className="text-white flex items-center gap-2 hover:border-1 hover:px-3 hover:py-2 p-1 rounded transition-all duration-300"
+                onClick={() => { setCreating(true) }} >
+                <svg width="40" height="40" viewBox="0 0 82 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M41 26.6665V53.3332M27.3333 39.9998H54.6666M75.1666 39.9998C75.1666 58.4093 59.8697 73.3332 41 73.3332C22.1302 73.3332 6.83331 58.4093 6.83331 39.9998C6.83331 21.5903 22.1302 6.6665 41 6.6665C59.8697 6.6665 75.1666 21.5903 75.1666 39.9998Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Create new
+
+
+              </button>
+
+
               <div className="flex flex-col mt-10">
-                <span className="text-white">Stye [....]</span>
-                <span className="text-white">CreatedAt/:</span>
+                {/* <span className="text-white">Stye [....]</span>
+                <span className="text-white">CreatedAt/:</span> */}
               </div>
             </div>
           </div>
 
           <div className="w-5/6 mt-5 pl-5">
             {/* Conditional Rendering */}
-            <ul className="flex flex-col gap-5 p-3">
+            <ul className="flex flex-col gap-8 p-3">
               {parts.map(part => printPart(part))}
             </ul>
           </div>
