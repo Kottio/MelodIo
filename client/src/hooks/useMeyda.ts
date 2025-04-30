@@ -10,7 +10,7 @@ export function useMeyda(minNoteLength = 30) {
   // const [lastNote, setLastNote] = useState('')
   const lastNoteRef = useRef<string | null>(null);
   const consecutiveNoteCount = useRef(0);
-  const [melody, setMelody] = useState<string[]>(["C", "B"]);
+  const [melody, setMelody] = useState<string[]>([]);
 
   const startRecording = async () => {
     try {

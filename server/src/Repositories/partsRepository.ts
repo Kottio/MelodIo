@@ -57,5 +57,11 @@ const partRepo = {
     // parts.push(newPart);
     // return true;
   },
+  // saveScale: async function (scale: string[], partId: number) {
+  //   return await prisma.parts.update({
+  //     where: { id: partId },
+  //     data: { scales: scale },
+  //   });
+  // },
 };
 export default partRepo;

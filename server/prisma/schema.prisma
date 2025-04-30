@@ -34,6 +34,7 @@ model Parts {
   melody         String[]
   composition    Compositions     @relation("CompositionParts", fields: [composition_id], references: [id])
   session        SessionsHarmony?
+  scales         String[]         @default([])
 }
 
 model SessionsHarmony {
@@ -46,4 +47,21 @@ model SessionsHarmony {
   style            String   @default("Neo-Classical")
   harmonization    Json
   part             Parts    @relation(fields: [partId], references: [id])
+}
+
+model Mode {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique // e.g., "Dorian"
+  description String? // Optional, e.g., "Minor mode with natural 6"
+  intervals   String[] // ["W", "H", "W", "W", "W", "H", "W"]
+  brightness  Int // Mood scale, e.g., 0 (dark) to 10 (bright)
+  notes       ModeNote[] // Root note variants
+}
+
+model ModeNote {
+  id     Int      @id @default(autoincrement())
+  modeId Int
+  root   String // e.g., "C", "C#", etc.
+  notes  String[] // e.g., ["C", "D", "E", "F", "G", "A", "B"]
+  mode   Mode     @relation(fields: [modeId], references: [id])
 }

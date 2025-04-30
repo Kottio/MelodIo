@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 
 const strRecording = "onClick({...})";
+import { styleEmojis } from "@/hooks/emoji";
 
 function Part() {
 
@@ -276,11 +277,11 @@ function Part() {
 
   return (
     <>
-      <div className="bg-white w-screen h-screen flex justify-center items-center">
-        <section className="bg-[#101010] w-13/14 h-13/14 rounded flex flex-col  items-center">
+      <div className="bg-[#101010]  w-screen h-screen flex justify-center items-center">
+        <section className="bg-[#101010] w-25/26 h-25/26  rounded flex flex-col  items-center">
           {/* <div className=" w-full flex flex-col items-center"> */}
-          <div className="w-full pt-5 flex justify-center items-start gap-3">
-            <div className="flex justify-end items-end w-5/7 pt-5 border-b-neutral-200 border-b-1 pb-2"></div>
+          <div className="w-full pt-3 pb-2 flex justify-center items-center gap-3">
+            <div className="flex justify-end items-end w-9/12 pt-5 border-b-neutral-200 border-b-1 "></div>
 
             <div className="flex items-end gap-4">
               <span className="text-neutral-200">Intermediate</span>
@@ -304,7 +305,7 @@ function Part() {
 
 
           {/* Begining of Section */}
-          <div className=" w-8/9 border-l-1  flex  mt-3 px-5 justify-between items-start">
+          <div className=" w-11/12 border-l-1  flex  mt-3 px-5 justify-between items-start">
 
             {/* Side bar */}
             <div className="flex justify-start items-start">
@@ -332,7 +333,8 @@ function Part() {
                     </svg>
                   </Link>
                   <span className="text-3xl text-neutral-200">
-                    PART {partId} of {compositionId}
+                    {/* PART {partId} of {compositionId} */}
+                    Harmonization
                   </span>
                 </div>
 
@@ -429,7 +431,7 @@ function Part() {
             >
               {!melodySaved && (
                 <div>
-                  <span className="text-white text-xl ">:/ Recorder</span>
+                  <span className={`${!isRecording ? "text-white" : "text-red-700"} text-xl font-bold `}>:/ Recorder</span>
                   {!isRecording ? (
                     <div
                       onClick={() => {
@@ -478,7 +480,7 @@ function Part() {
               {!melodySaved && (
                 <div>
                   <Button
-                    className="p-7 text-xl"
+                    className="p-6 text-xl"
                     disabled={isRecording || melody.length == 0}
                     onClick={() => {
                       setMelodySaved(true);
@@ -509,6 +511,7 @@ function Part() {
                 {isHarmonized && <div className="text-white flex flex-col  w-full items-start pt-5 ">
 
 
+
                   {showAdvices && <div><span className="text-xl font-bold">Advices for {style} </span>
                     <ul className="flex justify-center align-baseline p-2 gap-5">{harmonization.advices.map((advice, index) => {
                       return <li key={index} className=" border-l-1 p-2">
@@ -518,7 +521,11 @@ function Part() {
                         </div>
                       </li>
                     }
-                    )}</ul></div >
+                    )}
+
+                    </ul>
+
+                  </div >
 
                   }
 

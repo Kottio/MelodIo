@@ -6,19 +6,26 @@ export function getMusicStyleEmoji(style: string): string {
     "Bossa Nova": "🇧🇷",
     Jazz: "🎷",
     Blues: "🎸",
-    Rock: "🤘",
-    Pop: "🎤",
-    Electronic: "🎧",
     Funk: "🕺",
     Reggae: "🇯🇲",
-    "Hip Hop": "🎧",
-    Country: "🤠",
     Folk: "🪕",
-    Latin: "🪇",
-    Metal: "🔥",
     Ambient: "🌌",
-    Soul: "💖",
+    Soul: "🤌🏽",
   };
 
-  return styleMap[style] || "🎶"; // default emoji if not found
+  return styleMap[style] || "🎶"; // default emoji if not found]
 }
+
+export const styleEmojis = {
+  "Gipsy Jazz": "🎻",
+  Classical: "🎼",
+  "Neo-Classical": "🎹",
+  "Bossa Nova": "🇧🇷",
+  Jazz: "🎷",
+  Blues: "🎸",
+  Funk: "🕺",
+  Reggae: "🇯🇲",
+  Folk: "🪕",
+  Ambient: "🌌",
+  Soul: "🤌🏽",
+};

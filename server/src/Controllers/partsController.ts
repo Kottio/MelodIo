@@ -19,5 +19,13 @@ const partController = {
       res.status(201).json({ messgae: "Part Saved!" });
     }
   },
+  // putScale: async function (req: Request, res: Response) {
+  //   const { scale } = req.body;
+  //   const { partId } = req.params;
+  //   const response = await partRepo.saveScale(scale, +partId);
+  //   if (response.ok) {
+  //     res.status(201).json({ message: "Scale Saved" });
+  //   }
+  // },
 };
 export default partController;
